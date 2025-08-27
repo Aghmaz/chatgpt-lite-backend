@@ -57,6 +57,7 @@ app.post("/chat", async (req, res) => {
     // Send message to Gemini
     const result = await chat.sendMessage(message);
     const aiResponse = result.response.text();
+    console.log(aiResponse, "here is express.response");
     if (aiResponse.trim().length > 0) {
       return res.json({ response: aiResponse });
     }
