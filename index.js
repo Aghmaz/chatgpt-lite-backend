@@ -28,26 +28,15 @@ app.post("/chat", async (req, res) => {
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
     }
-
-    const systemPrompt = {
-      role: "user",
-      parts: [
-        "You are an expert assistant. Always provide a clear, helpful response no matter what. " +
-          "If the user asks something ambiguous, clarify it politely. " +
-          "Never say 'I cannot respond' — always give the best possible guidance.",
-      ],
-    };
-
-    const formattedHistory = [
-      systemPrompt,
-      ...conversationHistory.map((msg) => ({
-        role: msg.role === "user" ? "user" : "model",
-        parts: Array.isArray(msg.content) ? msg.content : [msg.content],
-      })),
-    ];
+    console.log(conversationHistory, "conversationHistory", message, "message");
     // Prepare conversation history for Gemini
     const chat = model.startChat({
-      history: formattedHistory,
+      history: conversationHistory
+        ? conversationHistory.map((msg) => ({
+            role: msg.role === "user" ? "user" : "model",
+            parts: msg.content,
+          }))
+        : [],
       generationConfig: {
         maxOutputTokens: 500,
         temperature: 0.7,
@@ -57,7 +46,7 @@ app.post("/chat", async (req, res) => {
     // Send message to Gemini
     const result = await chat.sendMessage(message);
     const aiResponse = result.response.text();
-    console.log(aiResponse, "here is express.response");
+    console.log(aiResponse, "aiResponse");
     if (aiResponse.trim().length > 0) {
       return res.json({ response: aiResponse });
     }
