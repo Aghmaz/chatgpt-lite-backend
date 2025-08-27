@@ -45,17 +45,11 @@ app.post("/chat", async (req, res) => {
 
     // Send message to Gemini
     const result = await chat.sendMessage(message);
-    const aiResponse = result.response.text();
-    console.log(aiResponse, "aiResponse");
-    if (aiResponse.trim().length > 0) {
-      return res.json({ response: aiResponse });
-    }
+    const aiResponse =
+      result.response.text() ||
+      "I'm experiencing some technical difficulties right now. Please try again later or check your API configuration.";
 
-    // If Gemini gave empty response → fallback
-    return res.json({
-      response:
-        "I am your expert assistant. It seems the system couldn’t generate a detailed answer right now, but I’m here to help. Please rephrase or try again.",
-    });
+    res.json({ response: aiResponse });
   } catch (error) {
     console.error("Error in chat endpoint:", error);
 
